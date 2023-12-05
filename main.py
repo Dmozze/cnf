@@ -110,6 +110,7 @@ for i in range(1, len(decart)):
         print("Time to iteration: ", time.time() - time_iter)
         print(len(filtered), "/",  j, "/", len(acc))
         print(solver.accum_stats())
+    print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
     acc = filtered
     if len(filtered) == 0:
         print("SUCCESS")
