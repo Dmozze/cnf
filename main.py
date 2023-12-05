@@ -90,6 +90,8 @@ for i in range(len(backdoors)):
     # print(len(results))
     decart.append(results)
 
+solver.delete()
+
 # sort by length desc
 decart.sort(key=lambda x: len(x))
 acc = decart[0]
@@ -101,16 +103,17 @@ for i in range(1, len(decart)):
     for j in range(len(acc)):
         # print(j, len(decart[i]))
         time_iter = time.time()
-        solver = Cadical153(bootstrap_with=formula)
-        solver.conf_budget(5000)
-        # print(decart[i][j])
-        solver.solve_limited(assumptions=acc[j])
-        if solver.get_status() is None:
-            filtered.append(acc[j])
-        print("Time to iteration: ", time.time() - time_iter)
-        print(len(filtered), "/",  j, "/", len(acc))
-        print(solver.accum_stats())
+        with Cadical153(bootstrap_with=formula) as solver:
+            solver.conf_budget(5000)
+            # print(decart[i][j])
+            solver.solve_limited(assumptions=acc[j])
+            if solver.get_status() is None:
+                filtered.append(acc[j])
+            print("Time to iteration: ", time.time() - time_iter)
+            print(len(filtered), "/",  j, "/", len(acc))
+            print(solver.accum_stats())
     print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
+    print("time from start: ", time.time() - start
     acc = filtered
     if len(filtered) == 0:
         print("SUCCESS")
