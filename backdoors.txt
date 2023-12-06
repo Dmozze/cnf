@@ -498,4 +498,3 @@ Best fitness 0.09375 (rho=0.90625, hard=24) on iteration 388 with 8 variables: [
 Best fitness 0.101562 (rho=0.898438, hard=26) on iteration 692 with 8 variables: [322, 519, 628, 642, 915, 1332, 1614, 1635]
 Best fitness 0.0429688 (rho=0.957031, hard=11) on iteration 997 with 8 variables: [0, 40, 966, 968, 1329, 1342, 1343, 1459]
 Best fitness 0.078125 (rho=0.921875, hard=20) on iteration 801 with 8 variables: [16, 317, 713, 971, 1327, 1359, 1426, 1520]
-
