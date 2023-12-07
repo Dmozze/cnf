@@ -96,20 +96,11 @@ def merge_backdoors(a, b):
 
 
 def merge_list(a, b):
-    modul_set = set(list(map(abs, a)) + list(map(abs, b)))
-    normal_set = set(a + b)
-    kek = False
-    if len(modul_set) != len(normal_set):
-        kek = True
-    lol = False
     result_set = set(a + b)
     result = list(set(a + b))
     for i in range(len(result)):
         if -result[i] in result_set:
-            lol = True
-    assert lol == kek
-    if lol:
-        return []
+            return []
     return result
 
 
