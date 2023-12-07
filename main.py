@@ -50,9 +50,14 @@ def get_unique_lists(lists):
 
 def merge_backdoors(a, b):
     result = []
+    cnt = 0
     for i in range(len(a)):
         for j in range(len(b)):
-            result.append(merge_list(a[i], b[j]))
+            merged = merge_list(a[i], b[j])
+            if merged:
+                status, res = _propagate(merged)
+                if status is None:
+                    result.append(merged)
     result = filter(lambda x: x != [], result)
     return list(result)
 
@@ -90,14 +95,15 @@ for i in range(len(backdoors)):
     # print(len(results))
     decart.append(results)
 
-solver.delete()
 
 # sort by length desc
 decart.sort(key=lambda x: len(x))
+print(list(map(len, decart)))
 acc = decart[0]
 for i in range(1, len(decart)):
     time_merge = time.time()
     acc = merge_backdoors(acc, decart[i])
+    print(acc)
     print("Time to merge: ", time.time() - time_merge)
     filtered = []
     for j in range(len(acc)):
@@ -113,7 +119,7 @@ for i in range(1, len(decart)):
             print(len(filtered), "/",  j, "/", len(acc))
             print(solver.accum_stats())
     print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
-    print("time from start: ", time.time() - start
+    print("time from start: ", time.time() - start)
     acc = filtered
     if len(filtered) == 0:
         print("SUCCESS")
