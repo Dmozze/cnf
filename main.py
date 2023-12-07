@@ -129,7 +129,10 @@ for i in range(len(backdoors)):
     # print(len(results))
     decart.append(results)
 
-
+statistics = dict()
+statistics['name'] = sys.argv[1]
+statistics['time_to_load'] = round(time.time() - start)
+send_to_telegram(statistics)
 
 # sort by length desc
 one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
@@ -137,14 +140,24 @@ if one_hard:
     all_one_hard = one_hard[0]
     for i in range(1, len(one_hard)):
         all_one_hard = merge_list(all_one_hard, one_hard[i])
+    statistics = dict()
+    statistics['name'] = sys.argv[1]
+    statistics['one_length'] = len(one_hard)
+    statistics['one_vars'] = len(all_one_hard)
+    send_to_telegram(statistics)
     if all_one_hard:
         for i in range(len(all_one_hard)):
             base_solver.add_clause([all_one_hard[i]])
     else:
         print("UNSAT")
         exit()
+print("len" + str(len(one_hard)))
 hards = list(filter(lambda x: len(x) > 1, decart))
 hards.sort(key=lambda x: len(x))
+statistics = dict()
+statistics['name'] = sys.argv[1]
+statistics['hards_length'] = len(hards)
+send_to_telegram(statistics)
 # print(list(map(len, decart)))
 acc = hards[0]
 for i in range(1, len(hards)):
