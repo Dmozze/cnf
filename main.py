@@ -1,11 +1,20 @@
 from pysat.solvers import Cadical153
 from pysat.formula import CNF
 import time
+import requests
 
 formula_path = 'original.cnf'
 backdoor_path = 'backdoors.txt'
 
 start = time.time()
+
+def send_to_telegram(data):
+    token = "6972984435:AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8"
+    requests.post(
+        url='https://api.telegram.org/bot{0}/{1}'.format(token, "sendMessage"),
+        data={'chat_id': 277499288, 'text': data}
+    )
+
 
 def backdoor_string_to_list(backdoor_string):
     return list(map(lambda x: x + 1, map(int, backdoor_string.split(':')[1].strip(' \n][').split(', '))))
@@ -121,6 +130,8 @@ for i in range(1, len(decart)):
             print("Time to iteration: ", time.time() - time_iter)
             print(len(filtered), "/",  j, "/", len(acc))
             print(solver.accum_stats())
+    strs = str((len(acc) - len(filtered)) / len(acc)) + " filtered:" + str(len(filtered)) + " acc:" + str(len(acc))
+    send_to_telegram(strs)
     print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
     print("time from start: ", time.time() - start)
     acc = filtered
