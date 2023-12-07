@@ -96,11 +96,20 @@ def merge_backdoors(a, b):
 
 
 def merge_list(a, b):
+    modul_set = set(list(map(abs, a)) + list(map(abs, b)))
+    normal_set = set(a + b)
+    kek = False
+    if len(modul_set) != len(normal_set):
+        kek = True
+    lol = False
     result_set = set(a + b)
     result = list(set(a + b))
     for i in range(len(result)):
         if -result[i] in result_set:
-            return []
+            lol = True
+    assert lol == kek
+    if lol:
+        return []
     return result
 
 
@@ -132,17 +141,29 @@ for i in range(len(backdoors)):
 
 
 # sort by length desc
-decart.sort(key=lambda x: len(x))
+one_hard = list(filter(lambda x: len(x) == 1, decart))
+if one_hard:
+    all_one_hard = one_hard[0]
+    for i in range(1, len(one_hard)):
+        all_one_hard = merge_list(all_one_hard, one_hard[i])
+    if all_one_hard:
+        for i in range(len(all_one_hard)):
+            base_solver.add_clause([all_one_hard[i]])
+    else:
+        print("UNSAT")
+        exit()
+hards = list(filter(lambda x: len(x) > 1, decart))
+hards.sort(key=lambda x: len(x))
 # print(list(map(len, decart)))
-acc = decart[0]
-with Cadical153(bootstrap_with=formula) as solver:
-    for i in range(1, len(decart)):
-        prop_hit = 0
-        time_merge = time.time()
-        acc = get_unique_lists(merge_backdoors(acc, decart[i]))
-        # print(acc)
-        print("Time to merge: ", time.time() - time_merge)
-        filtered = []
+acc = hards[0]
+for i in range(1, len(hards)):
+    prop_hit = 0
+    time_merge = time.time()
+    acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+    # print(acc)
+    print("Time to merge: ", time.time() - time_merge)
+    filtered = []
+    with Cadical153(bootstrap_with=formula) as solver:
         for j in range(len(acc)):
             # print(j, len(decart[i]))
             time_iter = time.time()
@@ -154,25 +175,27 @@ with Cadical153(bootstrap_with=formula) as solver:
             print("Time to iteration: ", time.time() - time_iter)
             print(len(filtered), "/", j + 1, "/", len(acc))
             print(solver.accum_stats())
-        statistics = dict()
-        # avg length of backdoor
-        statistics['name'] = sys.argv[1]
-        statistics['length'] = sum(map(len, acc)) / len(acc)
-        statistics['prop_hit'] = prop_hit
-        statistics['time'] = round(time.time() - start)
-        statistics['iteration_time'] = round(time.time() - time_merge)
-        statistics['iteration'] = i
-        statistics['acc'] = len(acc)
-        statistics['filtered'] = len(filtered)
-        # format 2 digits after point sifted
-        statistics['sifted'] = round((len(acc) - len(filtered)) / len(acc), 2)
+    statistics = dict()
+    # avg length of backdoor
+    # statistics['name'] = sys.argv[1]
+    statistics['length'] = sum(map(len, acc)) / len(acc)
+    statistics['prop_hit'] = prop_hit
+    statistics['time'] = round(time.time() - start)
+    statistics['iteration_time'] = round(time.time() - time_merge)
+    statistics['iteration'] = i
+    statistics['acc'] = len(acc)
+    statistics['filtered'] = len(filtered)
+    # format 2 digits after point sifted
+    statistics['sifted'] = round((len(acc) - len(filtered)) / len(acc), 2)
+    print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
+    print("time from start: ", time.time() - start)
+    acc = filtered
+    if len(filtered) == 0:
+        print("SUCCESS")
+        statistics['success'] = True
         send_to_telegram(statistics)
-        print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
-        print("time from start: ", time.time() - start)
-        acc = filtered
-        if len(filtered) == 0:
-            print("SUCCESS")
-            break
+        break
+    send_to_telegram(statistics)
 
 print(len(acc))
 for i in range(len(acc)):
