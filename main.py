@@ -16,6 +16,7 @@ prop_hit = 0
 
 def send_to_telegram(data):
     token = "6972984435:AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8"
+
     print(data)
     string = str(data)
     # add \n after each key-value pair
@@ -23,6 +24,10 @@ def send_to_telegram(data):
     # remove { and }
     string = string.replace("{", "")
     string = string.replace("}", "")
+    # kek in string
+    kek_in_string = string.find("kek")
+    if kek_in_string != -1:
+        return
 
     requests.post(
         url='https://api.telegram.org/bot{0}/{1}'.format(token, "sendMessage"),
@@ -157,7 +162,11 @@ hards.sort(key=lambda x: len(x))
 statistics = dict()
 statistics['name'] = sys.argv[1]
 statistics['hards_length'] = len(hards)
+flat_list = [item for sublist in hards for item in sublist]
+kek = [item for sublist in flat_list for item in sublist]
+statistics['hards_vars'] = len(hards)
 send_to_telegram(statistics)
+
 # print(list(map(len, decart)))
 acc = hards[0]
 for i in range(1, len(hards)):
