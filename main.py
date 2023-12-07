@@ -24,11 +24,12 @@ backdoors = []
 with open(backdoor_path, 'r') as f:
     for line in f:
         backdoors.append(backdoor_string_to_list(line))
-    print(backdoors)
+    # print(backdoors)
 
 
 def _propagate(assumptions):
-    (status, literals) = solver.propagate(assumptions)
+    # print(base_solver.propagate(assumptions))
+    (status, literals) = base_solver.propagate(assumptions)
 
     # pysat: The status is ``True`` if NO conflict arisen
     # during propagation. Otherwise, the status is ``False``.
@@ -38,7 +39,7 @@ def _propagate(assumptions):
     # The status is ``False`` if conflict arisen.
     # Otherwise, the status is ``None``.
 
-    all_assigned = len(literals) >= solver.nof_vars()
+    all_assigned = len(literals) >= base_solver.nof_vars()
     return status and (all_assigned or None), assumptions
 
 def get_unique_lists(lists):
@@ -54,6 +55,8 @@ def merge_backdoors(a, b):
     for i in range(len(a)):
         for j in range(len(b)):
             merged = merge_list(a[i], b[j])
+            # print(merged)
+            # print(type(merged))
             if merged:
                 status, res = _propagate(merged)
                 if status is None:
@@ -75,7 +78,7 @@ formula = CNF(from_file=formula_path)
 
 print("Number of variables: ", formula.nv)
 
-solver = Cadical153(bootstrap_with=formula, use_timer=True)
+base_solver = Cadical153(bootstrap_with=formula, use_timer=True)
 
 cnt = 0
 decart = []
@@ -103,7 +106,7 @@ acc = decart[0]
 for i in range(1, len(decart)):
     time_merge = time.time()
     acc = merge_backdoors(acc, decart[i])
-    print(acc)
+    # print(acc)
     print("Time to merge: ", time.time() - time_merge)
     filtered = []
     for j in range(len(acc)):
@@ -127,8 +130,8 @@ for i in range(1, len(decart)):
 
 print(len(acc))
 for i in range(len(acc)):
-    solver.solve(assumptions=acc[i])
-    print(solver.get_status())
+    base_solver.solve(assumptions=acc[i])
+    print(base_solver.get_status())
 # filter all results that are None
 # Solve the formula
 # solver.solve()
