@@ -1,7 +1,9 @@
 from pysat.solvers import Cadical153
 from pysat.formula import CNF
+import sys
 import time
 import requests
+
 
 formula_path = 'original.cnf'
 backdoor_path = 'backdoors.txt'
@@ -150,11 +152,16 @@ for i in range(1, len(decart)):
             if solver.get_status() is None:
                 filtered.append(acc[j])
             print("Time to iteration: ", time.time() - time_iter)
-            print(len(filtered), "/", j, "/", len(acc))
+            print(len(filtered), "/", j + 1, "/", len(acc))
             print(solver.accum_stats())
     statistics = dict()
+    # avg length of backdoor
+    statistics['name'] = sys.argv[1]
+    statistics['length'] = sum(map(len, acc)) / len(acc)
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
+    statistics['iteration_time'] = round(time.time() - time_merge)
+    statistics['iteration'] = i
     statistics['acc'] = len(acc)
     statistics['filtered'] = len(filtered)
     # format 2 digits after point sifted
@@ -177,3 +184,6 @@ for i in range(len(acc)):
 # print("Time: ", solver.time())
 # print("Time: ", solver.time_accum())
 print("Time: ", time.time() - start)
+
+
+
