@@ -132,7 +132,7 @@ for i in range(len(backdoors)):
 
 
 # sort by length desc
-one_hard = list(filter(lambda x: len(x) == 1, decart))
+one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
 if one_hard:
     all_one_hard = one_hard[0]
     for i in range(1, len(one_hard)):
