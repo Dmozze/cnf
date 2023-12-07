@@ -181,7 +181,7 @@ for i in range(1, len(hards)):
             print(solver.accum_stats())
     statistics = dict()
     # avg length of backdoor
-    # statistics['name'] = sys.argv[1]
+    statistics['name'] = sys.argv[1]
     statistics['length'] = sum(map(len, acc)) / len(acc)
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
