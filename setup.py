@@ -4,8 +4,8 @@ from datetime import datetime
 cnfs_types = ['CvK'] # , 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
 sizes = ['10', '11', '12']
 
-dumpy = "python3 dumpy.py {0} false > {1}"
-main = "python3 main.py {0} false > {1}"
+dumpy = "python3 dumpy.py {0} true > {1}"
+main = "python3 main.py {0} true > {1}"
 
 # create logs dir if not exists
 os.system("mkdir logs")

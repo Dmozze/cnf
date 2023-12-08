@@ -4,14 +4,12 @@ import sys
 import time
 import requests
 
-
 formula_path = 'original.cnf'
 backdoor_path = 'backdoors.txt'
 
 start = time.time()
 
 prop_hit = 0
-
 
 
 def send_to_telegram(data):
@@ -25,7 +23,6 @@ def send_to_telegram(data):
     if sys.argv[2] == "false":
         if 'success' not in data and 'time_to_load' not in data:
             return
-
 
     requests.post(
         url='https://api.telegram.org/bot{0}/{1}'.format(token, "sendMessage"),
@@ -78,7 +75,6 @@ def get_unique_lists(lists):
     return unique_lists
 
 
-kkk = 0
 
 def merge_backdoors(a, b):
     global prop_hit
@@ -105,6 +101,14 @@ def merge_list(a, b):
         if -result[i] in result_set:
             return []
     return result
+
+def get_unique_literals(lists):
+    unique_literals = set()
+    for l in lists:
+        for i in range(len(l)):
+            if l[i] not in unique_literals:
+                unique_literals.add(l[i])
+    return unique_literals
 
 
 # Create a new CNF object from file
@@ -170,7 +174,11 @@ acc = hards[0]
 for i in range(1, len(hards)):
     prop_hit = 0
     time_merge = time.time()
+    vars_acc = get_unique_literals(acc)
     acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+    vars_merged = get_unique_literals(acc)
+    print(vars_acc - vars_merged)
+
     # print(acc)
     print("Time to merge: ", time.time() - time_merge)
     filtered = []
@@ -189,6 +197,8 @@ for i in range(1, len(hards)):
     statistics = dict()
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
+    statistics['new_vars'] = len(vars_merged - vars_acc)
+    statistics['vars'] = vars_acc
     statistics['length'] = sum(map(len, acc)) / len(acc)
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
@@ -218,6 +228,3 @@ for i in range(len(acc)):
 # print("Time: ", solver.time())
 # print("Time: ", solver.time_accum())
 print("Time: ", time.time() - start)
-
-
-

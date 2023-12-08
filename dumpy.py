@@ -34,6 +34,6 @@ solver.solve()
 print("Time: ", time.time() - start)
 
 statistics = dict()
-statistics['name'] = sys[1]
+statistics['name'] = sys.argv[1]
 statistics['time_to_dumpy'] = time.time() - start
 statistics['success'] = True
