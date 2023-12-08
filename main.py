@@ -180,6 +180,7 @@ for i in range(1, len(hards)):
     print(vars_acc - vars_merged)
 
     # print(acc)
+    time_to_merge = time.time() - time_merge
     print("Time to merge: ", time.time() - time_merge)
     filtered = []
     with Cadical153(bootstrap_with=formula) as solver:
@@ -197,6 +198,7 @@ for i in range(1, len(hards)):
     statistics = dict()
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
+    statistics['time_to_merge'] = round(time_to_merge, 3)
     statistics['new_vars'] = len(vars_merged - vars_acc)
     statistics['vars'] = vars_acc
     statistics['length'] = sum(map(len, acc)) / len(acc)
