@@ -1,0 +1,4 @@
+cnf: lec_mult_CvK_11x11.cnf
+runs: 100
+iterations: 1000
+backdoor_sizes: ['8', '9', '10', '11', '12']

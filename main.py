@@ -16,18 +16,16 @@ prop_hit = 0
 
 def send_to_telegram(data):
     token = "6972984435:AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8"
-
-    print(data)
     string = str(data)
     # add \n after each key-value pair
     string = string.replace(", ", "\n")
     # remove { and }
     string = string.replace("{", "")
     string = string.replace("}", "")
-    # kek in string
-    kek_in_string = string.find("kek")
-    if kek_in_string != -1:
-        return
+    if sys.argv[2] == "false":
+        if 'success' not in data and 'time_to_load' not in data:
+            return
+
 
     requests.post(
         url='https://api.telegram.org/bot{0}/{1}'.format(token, "sendMessage"),
