@@ -200,7 +200,7 @@ for i in range(1, len(hards)):
     statistics['name'] = sys.argv[1]
     statistics['time_to_merge'] = round(time_to_merge, 3)
     statistics['new_vars'] = len(vars_merged - vars_acc)
-    statistics['vars'] = vars_acc
+    statistics['vars'] = len(vars_acc)
     statistics['length'] = sum(map(len, acc)) / len(acc)
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
