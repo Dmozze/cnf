@@ -6,8 +6,8 @@ from telegram import send_to_telegram
 cnfs_types = ['CvK']  # , 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
 sizes = ['10', '11', '12']
 
-dumpy = "python3 dumpy.py {0} false > {1}"
-main = "python3 main.py {0} false > {1}"
+dumpy = "python3 dumpy.py {0} true > {1}"
+main = "python3 main.py {0} true > {1}"
 main_prev = "python3 prev_main.py {0} false > {1}"
 
 # create logs dir if not exists
@@ -27,7 +27,6 @@ for muls in cnfs_types:
             # copy backdoors to backdoors.txt
             os.system("cp results/" + current_cnf_name + "/backdoors.txt backdoors.txt")
 
-            a = 1 / 0
             # copy cnf to original.cnf
             os.system("cp " + current_cnf + " original.cnf")
 

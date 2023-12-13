@@ -160,6 +160,7 @@ send_to_telegram(statistics, sys.argv[2])
 hards_to_merge = hards.copy()
 hards_to_merge.pop(0)
 acc = hards[0]
+sum_base = 0
 for i in range(1, len(hards)):
     prop_hit = 0
     time_merge = time.time()
@@ -200,6 +201,7 @@ for i in range(1, len(hards)):
     # print(acc)
     time_to_merge = time.time() - time_merge
     print("Time to merge: ", time.time() - time_merge)
+    sum_base += time.time() - time_merge
     filtered = []
     with Cadical153(bootstrap_with=formula) as solver:
         for j in range(len(acc)):
@@ -223,7 +225,7 @@ for i in range(1, len(hards)):
     statistics['var_mb_next'] = len(vars_mb_next)
     statistics['len_mb_next'] = len_mb_next
     statistics['prop_hit'] = prop_hit
-    statistics['time'] = round(time.time() - start)
+    statistics['time'] = round(time.time() - start - sum_base)
     statistics['iteration_time'] = round(time.time() - time_merge)
     statistics['iteration'] = i
     statistics['acc'] = len(acc)
