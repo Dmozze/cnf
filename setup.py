@@ -21,7 +21,7 @@ for muls in cnfs_types:
         current_cnf = "results/" + muls + "_" + size + "/lec_mult_" + muls + "_" + size + "x" + size + ".cnf"
         current_cnf_name = muls + "_" + size
 
-        # copy bacdoors to backdoors.txt
+        # copy backdoors to backdoors.txt
         os.system("cp results/" + current_cnf_name + "/backdoors.txt backdoors.txt")
 
         # copy cnf to original.cnf

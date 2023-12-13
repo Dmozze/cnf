@@ -4,7 +4,7 @@ import time
 base_setup = "./build/minisat {0} -ea-seed=42 -ea-num-runs={1} -ea-instance-size={2} -ea-num-iters={3} -ea-output-path={4} &"
 cnf_string = "lec_mult_{0}_{1}x{1}.cnf"
 
-cnfs_types = ['CvK'] # , 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
+cnfs_types = ['CvK', 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
 sizes = ['10', '11', '12']
 
 runs = 100

@@ -94,6 +94,9 @@ def get_unique_literals(lists):
                 unique_literals.add(l[i])
     return unique_literals
 
+def avg_length(backdoor):
+    return sum(map(len, backdoor)) / len(backdoor)
+
 
 # Create a new CNF object from file
 formula = CNF(from_file=formula_path)
@@ -123,7 +126,7 @@ for i in range(len(backdoors)):
 statistics = dict()
 statistics['name'] = sys.argv[1]
 statistics['time_to_load'] = round(time.time() - start)
-send_to_telegram(statistics)
+send_to_telegram(statistics, sys.argv[2])
 
 # sort by length desc
 one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
@@ -135,7 +138,7 @@ if one_hard:
     statistics['name'] = sys.argv[1]
     statistics['one_length'] = len(one_hard)
     statistics['one_vars'] = len(all_one_hard)
-    send_to_telegram(statistics)
+    send_to_telegram(statistics, sys.argv[2])
     if all_one_hard:
         for i in range(len(all_one_hard)):
             base_solver.add_clause([all_one_hard[i]])
@@ -151,17 +154,48 @@ statistics['hards_length'] = len(hards)
 flat_list = [item for sublist in hards for item in sublist]
 kek = [item for sublist in flat_list for item in sublist]
 statistics['hards_vars'] = len(hards)
-send_to_telegram(statistics)
+send_to_telegram(statistics, sys.argv[2])
 
 # print(list(map(len, decart)))
+hards_to_merge = hards.copy()
+hards_to_merge.pop(0)
 acc = hards[0]
 for i in range(1, len(hards)):
     prop_hit = 0
     time_merge = time.time()
     vars_acc = get_unique_literals(acc)
-    acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+    # choice best backdoor by avg length
+    acc_avg_len = avg_length(acc)
+    acc_length = avg_length(acc)
+    acc_len = (avg_length(get_unique_lists(merge_backdoors(acc, hards_to_merge[0]))) - acc_avg_len) / len(get_unique_lists(merge_backdoors(acc, hards[i])))
+    avg_best_index = 0
+
+    for j in range(len(hards_to_merge)):
+
+        next = get_unique_lists(merge_backdoors(acc, hards_to_merge[j]))
+        next_len = len(next)
+        next_literals = get_unique_literals(next)
+        comprasion = (avg_length(next) - acc_avg_len) / next_len
+        if (avg_length(next) - acc_avg_len) / next_len > acc_len:
+            avg_best_index = j
+            acc_len = (avg_length(next) - acc_avg_len) / next_len
+
+    print("choice best backdoor by avg length: ", avg_best_index, acc_len)
+    mb_next = get_unique_lists(merge_backdoors(acc, hards[i]))
+    vars_mb_next = get_unique_literals(mb_next)
+    len_mb_next = avg_length(mb_next)
+
+    acc = get_unique_lists(merge_backdoors(acc, hards_to_merge[avg_best_index]))
     vars_merged = get_unique_literals(acc)
-    print(vars_acc - vars_merged)
+    len_merged = avg_length(acc)
+    print("comprarison avg len: ", len_merged, len_mb_next)
+    print("comprarison len: ", len(acc), len(mb_next))
+
+    # erase merged backdoor
+    hards_to_merge.pop(avg_best_index)
+    print(len(hards_to_merge), "/", i + 1, "/", len(hards))
+
+    prop_hit = 0
 
     # print(acc)
     time_to_merge = time.time() - time_merge
@@ -185,7 +219,9 @@ for i in range(1, len(hards)):
     statistics['time_to_merge'] = round(time_to_merge, 3)
     statistics['new_vars'] = len(vars_merged - vars_acc)
     statistics['vars'] = len(vars_acc)
-    statistics['length'] = sum(map(len, acc)) / len(acc)
+    statistics['length'] = avg_length(acc)
+    statistics['var_mb_next'] = len(vars_mb_next)
+    statistics['len_mb_next'] = len_mb_next
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
     statistics['iteration_time'] = round(time.time() - time_merge)
@@ -200,9 +236,9 @@ for i in range(1, len(hards)):
     if len(filtered) == 0:
         print("SUCCESS")
         statistics['success'] = True
-        send_to_telegram(statistics)
+        send_to_telegram(statistics, sys.argv[2])
         break
-    send_to_telegram(statistics)
+    send_to_telegram(statistics, sys.argv[2])
 
 print(len(acc))
 for i in range(len(acc)):
