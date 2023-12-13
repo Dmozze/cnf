@@ -186,11 +186,7 @@ for i in range(1, len(hards)):
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
     statistics['time_to_merge'] = round(time_to_merge, 3)
-    statistics['new_vars'] = len(vars_merged - vars_acc)
-    statistics['vars'] = len(vars_acc)
     statistics['length'] = avg_length(acc)
-    statistics['var_mb_next'] = len(vars_mb_next)
-    statistics['len_mb_next'] = len_mb_next
     statistics['prop_hit'] = prop_hit
     statistics['time'] = round(time.time() - start)
     statistics['iteration_time'] = round(time.time() - time_merge)

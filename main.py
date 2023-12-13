@@ -185,6 +185,7 @@ for i in range(1, len(hards)):
     mb_next = get_unique_lists(merge_backdoors(acc, hards[i]))
     vars_mb_next = get_unique_literals(mb_next)
     len_mb_next = avg_length(mb_next)
+    prop_hit = 0
 
     acc = get_unique_lists(merge_backdoors(acc, hards_to_merge[avg_best_index]))
     vars_merged = get_unique_literals(acc)
@@ -195,8 +196,6 @@ for i in range(1, len(hards)):
     # erase merged backdoor
     hards_to_merge.pop(avg_best_index)
     print(len(hards_to_merge), "/", i + 1, "/", len(hards))
-
-    prop_hit = 0
 
     # print(acc)
     time_to_merge = time.time() - time_merge
