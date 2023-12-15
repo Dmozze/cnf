@@ -170,8 +170,6 @@ hards_to_merge = hards.copy()
 hards_to_merge.pop(0)
 acc = hards[0]
 for i in range(1, len(hards)):
-    if i == 5:
-        break
     time_merge = time.time()
     prop_hit = 0
     acc = get_unique_lists(merge_backdoors(acc, hards[i]))

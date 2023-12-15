@@ -36,6 +36,6 @@ for muls in cnfs_types:
             # run dumpy.py
 
             log_name_with_minutes = "logs/" + muls + "_" + size + "/" + current_time_without_mills + "/" + "dumpy.txt"
-            os.system(dumpy.format("dumpy_" + current_cnf_name, log_name_with_minutes))
+            # os.system(dumpy.format("dumpy_" + current_cnf_name, log_name_with_minutes))
         except:
             send_to_telegram("ERROR: " + muls + "_" + size + " " + current_time_without_mills, "true")
