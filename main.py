@@ -2,9 +2,11 @@ from pysat.solvers import Cadical153
 from pysat.formula import CNF
 import sys
 import time
-import requests
+import numpy as np
+import pandas as pd
+import seaborn as sns
 
-from telegram import send_to_telegram
+from telegram import send_to_telegram, send_to_photo
 
 formula_path = 'original.cnf'
 backdoor_path = 'backdoors.txt'
@@ -59,7 +61,6 @@ def get_unique_lists(lists):
     return unique_lists
 
 
-
 def merge_backdoors(a, b):
     global prop_hit
     result = []
@@ -86,6 +87,7 @@ def merge_list(a, b):
             return []
     return result
 
+
 def get_unique_literals(lists):
     unique_literals = set()
     for l in lists:
@@ -94,8 +96,9 @@ def get_unique_literals(lists):
                 unique_literals.add(l[i])
     return unique_literals
 
-def avg_length(backdoor):
-    return sum(map(len, backdoor)) / len(backdoor)
+
+def avg_length(arg):
+    return sum(map(len, arg)) / len(arg)
 
 
 # Create a new CNF object from file
@@ -122,6 +125,12 @@ for i in range(len(backdoors)):
     # print(len(get_unique_lists(results)))
     # print(len(results))
     decart.append(results)
+
+# seaborn set up
+product_size_before_prop = []
+product_size_after_prop = []
+product_size_after_sifting = []
+product_len = []
 
 statistics = dict()
 statistics['name'] = sys.argv[1]
@@ -160,47 +169,18 @@ send_to_telegram(statistics, sys.argv[2])
 hards_to_merge = hards.copy()
 hards_to_merge.pop(0)
 acc = hards[0]
-sum_base = 0
 for i in range(1, len(hards)):
-    prop_hit = 0
+    if i == 5:
+        break
     time_merge = time.time()
-    vars_acc = get_unique_literals(acc)
-    # choice best backdoor by avg length
-    acc_avg_len = avg_length(acc)
-    acc_length = avg_length(acc)
-    acc_len = (avg_length(get_unique_lists(merge_backdoors(acc, hards_to_merge[0]))) - acc_avg_len) / len(get_unique_lists(merge_backdoors(acc, hards[i])))
-    avg_best_index = 0
-
-    for j in range(len(hards_to_merge)):
-
-        next = get_unique_lists(merge_backdoors(acc, hards_to_merge[j]))
-        next_len = len(next)
-        next_literals = get_unique_literals(next)
-        comprasion = (avg_length(next) - acc_avg_len) / next_len
-        if (avg_length(next) - acc_avg_len) / next_len > acc_len:
-            avg_best_index = j
-            acc_len = (avg_length(next) - acc_avg_len) / next_len
-
-    print("choice best backdoor by avg length: ", avg_best_index, acc_len)
-    mb_next = get_unique_lists(merge_backdoors(acc, hards[i]))
-    vars_mb_next = get_unique_literals(mb_next)
-    len_mb_next = avg_length(mb_next)
     prop_hit = 0
-
-    acc = get_unique_lists(merge_backdoors(acc, hards_to_merge[avg_best_index]))
-    vars_merged = get_unique_literals(acc)
-    len_merged = avg_length(acc)
-    print("comprarison avg len: ", len_merged, len_mb_next)
-    print("comprarison len: ", len(acc), len(mb_next))
-
-    # erase merged backdoor
-    hards_to_merge.pop(avg_best_index)
-    print(len(hards_to_merge), "/", i + 1, "/", len(hards))
+    acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+    product_size_before_prop.append(len(acc) + prop_hit)
+    product_size_after_prop.append(len(acc))
 
     # print(acc)
     time_to_merge = time.time() - time_merge
     print("Time to merge: ", time.time() - time_merge)
-    sum_base += time.time() - time_merge
     filtered = []
     with Cadical153(bootstrap_with=formula) as solver:
         for j in range(len(acc)):
@@ -218,13 +198,9 @@ for i in range(1, len(hards)):
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
     statistics['time_to_merge'] = round(time_to_merge, 3)
-    statistics['new_vars'] = len(vars_merged - vars_acc)
-    statistics['vars'] = len(vars_acc)
     statistics['length'] = avg_length(acc)
-    statistics['var_mb_next'] = len(vars_mb_next)
-    statistics['len_mb_next'] = len_mb_next
     statistics['prop_hit'] = prop_hit
-    statistics['time'] = round(time.time() - start - sum_base)
+    statistics['time'] = round(time.time() - start)
     statistics['iteration_time'] = round(time.time() - time_merge)
     statistics['iteration'] = i
     statistics['acc'] = len(acc)
@@ -234,12 +210,30 @@ for i in range(1, len(hards)):
     print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
     print("time from start: ", time.time() - start)
     acc = filtered
+    product_size_after_sifting.append(len(filtered))
     if len(filtered) == 0:
         print("SUCCESS")
         statistics['success'] = True
         send_to_telegram(statistics, sys.argv[2])
         break
     send_to_telegram(statistics, sys.argv[2])
+
+iteration_num = len(product_size_after_prop)
+iterations = list(range(iteration_num))
+data_preproc = pd.DataFrame({
+    'Iterations': iterations,
+    'before propagation': np.array(product_size_before_prop),
+    'after propagation': np.array(product_size_after_prop),
+    'after sifting': np.array(product_size_after_sifting),
+})
+
+
+sns_plot = sns.lineplot(x='Iterations', y='value', hue='variable',
+                        data=pd.melt(data_preproc, ['Iterations'])).set_title(sys.argv[1])
+
+sns_plot.figure.savefig("output.png")
+
+send_to_photo("output.png")
 
 print(len(acc))
 for i in range(len(acc)):

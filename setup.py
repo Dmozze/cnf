@@ -8,7 +8,6 @@ sizes = ['10', '11', '12']
 
 dumpy = "python3 dumpy.py {0} false > {1}"
 main = "python3 main.py {0} false > {1}"
-main_prev = "python3 prev_main.py {0} false > {1}"
 
 # create logs dir if not exists
 os.system("mkdir logs")
@@ -29,10 +28,6 @@ for muls in cnfs_types:
 
             # copy cnf to original.cnf
             os.system("cp " + current_cnf + " original.cnf")
-
-
-            log_name_with_minutes = "logs/" + muls + "_" + size + "/" + current_time_without_mills + "/" + "main_prev.txt"
-            os.system(main_prev.format("prev_" + current_cnf_name, log_name_with_minutes))
 
             # run main.py with time
             log_name_with_minutes = "logs/" + muls + "_" + size + "/" + current_time_without_mills + "/" + "main.txt"
