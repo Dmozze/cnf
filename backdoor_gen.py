@@ -4,12 +4,12 @@ import time
 base_setup = "./build/minisat {0} -ea-seed=42 -ea-num-runs={1} -ea-instance-size={2} -ea-num-iters={3} -ea-output-path={4} &"
 cnf_string = "lec_mult_{0}_{1}x{1}.cnf"
 
-cnfs_types = ['CvK', 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
-sizes = ['10', '11', '12']
+cnfs_types = ['CvK'] #, 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
+sizes = ['12'] #['10', '11', '12']
 
 runs = 100
-iterations = 1000
-backdoor_sizes = ['8', '9', '10', '11', '12']
+iterations = 5000
+backdoor_sizes = ['7', '8', '9', '10', '11', '12']
 
 os.system("mkdir results")
 for muls in cnfs_types:
@@ -32,9 +32,9 @@ for muls in cnfs_types:
             current_setup = base_setup.format("cnfs/" + current_cnf, runs, backdoor_size, iterations, "results/" + current_cnf_name + "/backdoors" + "/" + backdoor_size + ".txt")
             print(current_setup)
             os.system(current_setup)
-        time.sleep(200)
+        time.sleep(10)
 
-
+time.sleep(150)
 # merge backdoors to one
 for muls in cnfs_types:
     for size in sizes:
