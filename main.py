@@ -137,6 +137,16 @@ statistics['name'] = sys.argv[1]
 statistics['time_to_load'] = round(time.time() - start)
 send_to_telegram(statistics, sys.argv[2])
 
+# histogram of backdoors length
+hards_in_backdoors = []
+for i in range(len(decart)):
+    hards_in_backdoors.append(len(decart[i]))
+
+sns_plot = sns.histplot(hards_in_backdoors, kde=True).set_title(sys.argv[1])
+sns_plot.figure.savefig("hist.png")
+
+send_to_photo("hist.png")
+
 # sort by length desc
 one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
 if one_hard:
