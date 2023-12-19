@@ -179,22 +179,22 @@ send_to_telegram(statistics, sys.argv[2])
 hards_to_merge = hards.copy()
 hards_to_merge.pop(0)
 acc = hards[0]
-with Cadical153(bootstrap_with=formula) as solver:
-    for i in range(1, len(hards)):
-        time_merge = time.time()
-        prop_hit = 0
-        acc = get_unique_lists(merge_backdoors(acc, hards[i]))
-        product_size_before_prop.append(len(acc) + prop_hit)
-        product_size_after_prop.append(len(acc))
+for i in range(1, len(hards)):
+    time_merge = time.time()
+    prop_hit = 0
+    acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+    product_size_before_prop.append(len(acc) + prop_hit)
+    product_size_after_prop.append(len(acc))
 
-        # print(acc)
-        time_to_merge = time.time() - time_merge
-        print("Time to merge: ", time.time() - time_merge)
-        filtered = []
+    # print(acc)
+    time_to_merge = time.time() - time_merge
+    print("Time to merge: ", time.time() - time_merge)
+    filtered = []
+    with Cadical153(bootstrap_with=formula) as solver:
         for j in range(len(acc)):
             # print(j, len(decart[i]))
             time_iter = time.time()
-            solver.conf_budget(5000)
+            solver.conf_budget(40000)
             # print(decart[i][j])
             solver.solve_limited(assumptions=acc[j])
             if solver.get_status() is None:
@@ -202,29 +202,29 @@ with Cadical153(bootstrap_with=formula) as solver:
             print("Time to iteration: ", time.time() - time_iter)
             print(len(filtered), "/", j + 1, "/", len(acc))
             print(solver.accum_stats())
-        statistics = dict()
-        # avg length of backdoor
-        statistics['name'] = sys.argv[1]
-        statistics['time_to_merge'] = round(time_to_merge, 3)
-        statistics['length'] = avg_length(acc)
-        statistics['prop_hit'] = prop_hit
-        statistics['time'] = round(time.time() - start)
-        statistics['iteration_time'] = round(time.time() - time_merge)
-        statistics['iteration'] = i
-        statistics['acc'] = len(acc)
-        statistics['filtered'] = len(filtered)
-        # format 2 digits after point sifted
-        statistics['sifted'] = round((len(acc) - len(filtered)) / len(acc), 2)
-        print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
-        print("time from start: ", time.time() - start)
-        acc = filtered
-        product_size_after_sifting.append(len(filtered))
-        if len(filtered) == 0:
-            print("SUCCESS")
-            statistics['success'] = True
-            send_to_telegram(statistics, sys.argv[2])
-            break
+    statistics = dict()
+    # avg length of backdoor
+    statistics['name'] = sys.argv[1]
+    statistics['time_to_merge'] = round(time_to_merge, 3)
+    statistics['length'] = avg_length(acc)
+    statistics['prop_hit'] = prop_hit
+    statistics['time'] = round(time.time() - start)
+    statistics['iteration_time'] = round(time.time() - time_merge)
+    statistics['iteration'] = i
+    statistics['acc'] = len(acc)
+    statistics['filtered'] = len(filtered)
+    # format 2 digits after point sifted
+    statistics['sifted'] = round((len(acc) - len(filtered)) / len(acc), 2)
+    print("sifted: ", (len(acc) - len(filtered)) / len(acc), "filtered:", len(filtered), "acc:", len(acc))
+    print("time from start: ", time.time() - start)
+    acc = filtered
+    product_size_after_sifting.append(len(filtered))
+    if len(filtered) == 0:
+        print("SUCCESS")
+        statistics['success'] = True
         send_to_telegram(statistics, sys.argv[2])
+        break
+    send_to_telegram(statistics, sys.argv[2])
 
 iteration_num = len(product_size_after_prop)
 iterations = list(range(iteration_num))
