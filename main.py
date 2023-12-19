@@ -145,6 +145,8 @@ for i in range(len(decart)):
 sns_plot = sns.histplot(hards_in_backdoors, kde=True).set_title(sys.argv[1])
 sns_plot.figure.savefig("hist.png")
 
+sns_plot.figure.clf()
+
 send_to_photo("hist.png")
 
 # sort by length desc
