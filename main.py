@@ -166,6 +166,7 @@ if one_hard:
     else:
         print("UNSAT")
         exit()
+
 print("len" + str(len(one_hard)))
 hards = list(filter(lambda x: len(x) > 1, decart))
 hards.sort(key=lambda x: len(x))
