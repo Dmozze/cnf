@@ -193,18 +193,23 @@ for i in range(1, len(hards)):
     time_to_merge = time.time() - time_merge
     print("Time to merge: ", time.time() - time_merge)
     filtered = []
-    with Cadical153(bootstrap_with=formula) as solver:
-        for j in range(len(acc)):
-            # print(j, len(decart[i]))
-            time_iter = time.time()
-            solver.conf_budget(40000)
-            # print(decart[i][j])
-            solver.solve_limited(assumptions=acc[j])
-            if solver.get_status() is None:
-                filtered.append(acc[j])
-            print("Time to iteration: ", time.time() - time_iter)
-            print(len(filtered), "/", j + 1, "/", len(acc))
-            print(solver.accum_stats())
+    solver = Cadical153(bootstrap_with=formula)
+    cnt_steps = 0
+    for j in range(len(acc)):
+        cnt_steps += 1
+        if cnt_steps > 150:
+            solver = Cadical153(bootstrap_with=formula)
+            cnt_steps = 0
+        # print(j, len(decart[i]))
+        time_iter = time.time()
+        solver.conf_budget(40000)
+        # print(decart[i][j])
+        solver.solve_limited(assumptions=acc[j])
+        if solver.get_status() is None:
+            filtered.append(acc[j])
+        print("Time to iteration: ", time.time() - time_iter)
+        print(len(filtered), "/", j + 1, "/", len(acc))
+        print(solver.accum_stats())
     statistics = dict()
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
