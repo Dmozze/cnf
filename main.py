@@ -211,6 +211,7 @@ for i in range(1, len(hards)):
         print("Time to iteration: ", time.time() - time_iter)
         print(len(filtered), "/", j + 1, "/", len(acc))
         print(solver.accum_stats())
+    solver.delete()
     statistics = dict()
     # avg length of backdoor
     statistics['name'] = sys.argv[1]
