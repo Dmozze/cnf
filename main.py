@@ -198,6 +198,7 @@ for i in range(1, len(hards)):
     for j in range(len(acc)):
         cnt_steps += 1
         if cnt_steps > 150:
+            solver.delete()
             solver = Cadical153(bootstrap_with=formula)
             cnt_steps = 0
         # print(j, len(decart[i]))
