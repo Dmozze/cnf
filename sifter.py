@@ -13,7 +13,7 @@ def work(list_to_sift, formula):
             solver = Cadical153(bootstrap_with=formula)
             cnt_steps = 0
         # time_iter = time.time()
-        solver.conf_budget(10000)
+        solver.conf_budget(40000)
         solver.solve_limited(assumptions=list_to_sift[j])
         if solver.get_status() is None:
             inner_filtered.append(list_to_sift[j])
