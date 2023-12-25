@@ -165,6 +165,7 @@ if __name__ == '__main__':
         if all_one_hard:
             for i in range(len(all_one_hard)):
                 base_solver.add_clause([all_one_hard[i]])
+                formula.append([all_one_hard[i]])
         else:
             print("UNSAT")
             exit()
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     hards_to_merge = hards.copy()
     hards_to_merge.pop(0)
     acc = hards[0]
-    threads_num = 12
+    threads_num = 1
     for i in range(1, len(hards)):
         time_merge = time.time()
         prop_hit = 0
@@ -197,7 +198,7 @@ if __name__ == '__main__':
         time_to_merge = time.time() - time_merge
         print("Time to merge: ", time.time() - time_merge)
 
-        if len(acc) < 36:
+        if len(acc) < 36 or threads_num == 1:
             filtered = work(acc, formula)
         else:
             filtered = set_up_threads(acc, threads_num, formula)
