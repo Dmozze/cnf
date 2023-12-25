@@ -45,5 +45,5 @@ for muls in cnfs_types:
         for backdoor_size in backdoor_sizes:
             os.system("cat results/" + current_cnf_name + "/backdoors/" + backdoor_size + ".txt >> results/" + current_cnf_name + "/backdoors.txt")
         check_all_lines_copy = "cat results/" + current_cnf_name + "/backdoors.txt | wc -l"
-        if os.system(check_all_lines_copy12.txt) != runs * len(backdoor_sizes):
+        if os.system(check_all_lines_copy) != runs * len(backdoor_sizes):
             print("ERROR: " + current_cnf_name)

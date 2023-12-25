@@ -1,0 +1,13 @@
+backdoors:
+  size: 12
+  type: CvK
+base_path: /
+solver:
+  iterations: 40000
+  restart_each: 150
+telegram:
+  bot_id: '6972984435'
+  chat_id: '277499288'
+  send_all: false
+  send_nothing: false
+  token: AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8
