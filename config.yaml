@@ -6,8 +6,13 @@ solver:
   iterations: 40000
   restart_each: 150
 telegram:
-  bot_id: '6972984435'
+#  bot_id: '6972984435'
+#  token: AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8
+  bot_id: '6662740569'
+  token: AAENmISLqnZQBwEuNdkjymyz_hEx_zc1TvA
   chat_id: '277499288'
-  send_all: false
+  send_all: true
   send_nothing: false
-  token: AAGeBAFCALEoz2SXhHLX-uyyj0HWbVny9l8
+sifter:
+  steps_before_restart: 100
+  budget: 5000

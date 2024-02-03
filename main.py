@@ -6,13 +6,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from sifter import set_up_threads, work
-from telegram import send_to_telegram, send_to_photo
+from utils.backdoors import calculate_quality_of_backdoor
+from utils.sifter import set_up_threads, work
+from utils.telegram import send_to_telegram, send_to_photo
+from utils.backdoors import get_all_units_from_backdoor, get_all_biunits_from_backdoor
 
 formula_path = 'original.cnf'
 backdoor_path = 'backdoors.txt'
 hist_path = 'hist.png'
 iteration_plot_path = 'output.png'
+solved = True
 
 if __name__ == '__main__':
     start = time.time()
@@ -21,7 +24,7 @@ if __name__ == '__main__':
 
 
     def backdoor_string_to_list(backdoor_string):
-        return list(map(lambda x: x + 1, map(int, backdoor_string.split(':')[1].strip(' \n][').split(', '))))
+        return list(map(lambda x: x + 0, map(int, backdoor_string.split('[')[1].split(']')[0].split(', '))))
 
 
     def next_backdoor(bitvector):
@@ -42,16 +45,7 @@ if __name__ == '__main__':
 
 
     def _propagate(assumptions):
-        # print(base_solver.propagate(assumptions))
         (status, literals) = base_solver.propagate(assumptions)
-
-        # pysat: The status is ``True`` if NO conflict arisen
-        # during propagation. Otherwise, the status is ``False``.
-
-        # evoguess: The status is ``True`` if NO conflict arisen
-        # during propagation and all literals in formula assigned.
-        # The status is ``False`` if conflict arisen.
-        # Otherwise, the status is ``None``.
 
         all_assigned = len(literals) >= base_solver.nof_vars()
         return status and (all_assigned or None), assumptions
@@ -122,7 +116,9 @@ if __name__ == '__main__':
             results.append((result, assumps.copy()))
             cnt += 1
             backdoor = next_backdoor(backdoor)
+        # print(cnt, len(results))
         results = list(filter(lambda x: x[0] is None, results))
+        # print(cnt, len(results))
         results = list(map(lambda x: x[1], results))
         # print(len(get_unique_lists(results)))
         # print(len(results))
@@ -182,15 +178,36 @@ if __name__ == '__main__':
     send_to_telegram(statistics)
     statistics = dict()
 
+    # print(calculate_quality_of_backdoor(hards))
+
     # print(list(map(len, decart)))
     hards_to_merge = hards.copy()
     hards_to_merge.pop(0)
     acc = hards[0]
     threads_num = 1
+    inserted_units = set()
     for i in range(1, len(hards)):
         time_merge = time.time()
         prop_hit = 0
         acc = get_unique_lists(merge_backdoors(acc, hards[i]))
+        # print(acc)
+        unit = get_all_units_from_backdoor(acc)
+        # print(unit)
+        biunit = get_all_biunits_from_backdoor(acc)
+        print("Units: ", len(unit), "Biunits: ", len(biunit))
+        print("Formula length: ", len(formula.clauses))
+        # formula.append(unit)
+        for j in range(len(unit)):
+            if unit[j] not in inserted_units:
+                formula.append([-unit[j]])
+                inserted_units.add(unit[j])
+        # for j in range(len(biunit)):
+        #     first = biunit[j][0]
+        #     second = biunit[j][1]
+        #     formula.append([-first])
+        #     formula.append([-second])
+        print("Formula length: ", len(formula.clauses))
+
         product_size_before_prop.append(len(acc) + prop_hit)
         product_size_after_prop.append(len(acc))
 
@@ -218,6 +235,8 @@ if __name__ == '__main__':
             inner_statistics['sifted'] = round((len(acc) - len(filtered)) / len(acc), 2)
             inner_statistics['all_sifted'] = round((len(acc) - len(filtered)) / (prop_hit + len(acc)), 2)
             if len(filtered) == 0:
+                global solved
+                solved = True
                 print("SUCCESS")
                 inner_statistics['success'] = True
             return inner_statistics
@@ -248,8 +267,9 @@ if __name__ == '__main__':
 
     send_to_photo(iteration_plot_path)
 
-    for i in range(len(acc)):
-        base_solver.solve(assumptions=acc[i])
-        print(base_solver.get_status())
+    if not solved:
+        for i in range(len(acc)):
+            base_solver.solve(assumptions=acc[i])
+            print(base_solver.get_status())
 
     print("Time: ", time.time() - start)

@@ -1,11 +1,10 @@
 import sys
 
-import requests
 from pysat.solvers import Cadical153
 from pysat.formula import CNF
 import time
 
-from telegram import send_to_telegram
+from utils.telegram import send_to_telegram
 
 formula_path = 'original.cnf'
 start = time.time()

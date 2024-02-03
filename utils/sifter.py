@@ -1,6 +1,8 @@
 import numpy as np
 from pysat.solvers import Cadical153
 
+import utils
+
 
 def work(list_to_sift, formula):
     inner_filtered = []
@@ -8,12 +10,12 @@ def work(list_to_sift, formula):
     cnt_steps = 0
     for j in range(len(list_to_sift)):
         cnt_steps += 1
-        if cnt_steps > 150:
+        if cnt_steps >= utils.conf['sifter']['steps_before_restart']:
             solver.delete()
             solver = Cadical153(bootstrap_with=formula)
             cnt_steps = 0
         # time_iter = time.time()
-        solver.conf_budget(40000)
+        solver.conf_budget(utils.conf['sifter']['budget'])
         solver.solve_limited(assumptions=list_to_sift[j])
         if solver.get_status() is None:
             inner_filtered.append(list_to_sift[j])
@@ -24,14 +26,8 @@ def work(list_to_sift, formula):
     return inner_filtered
 
 
-# random shuffle acc
-# np.random.shuffle(acc)
-
-# split acc to threads_num parts
-
-
 def set_up_threads(acc, threads_num, formula):
-    acc_parts = np.array_split(acc, threads_num * 2)
+    acc_parts = np.array_split(acc, max(threads_num, len(acc) / 150))
     for j in range(len(acc_parts)):
         acc_parts[j] = acc_parts[j].tolist()
 

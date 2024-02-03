@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from telegram import send_to_telegram
+from utils.telegram import send_to_telegram
 
 cnfs_types = ['CvK']  # , 'CvD', 'CvW', 'DvK', 'DvW', 'KvW']
 sizes = ['10', '11', '12']

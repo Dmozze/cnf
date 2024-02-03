@@ -17,7 +17,7 @@ sizes = ['12']  # ['10', '11', '12']
 runs = 1
 meta_runs = 100
 iterations = 15000
-backdoor_sizes = ['7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
+backdoor_sizes = ['13', '14', '15', '16'] #['7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
 
 gen = sys.argv[1] == "gen"
 
@@ -55,25 +55,21 @@ if gen:
                 # meta.close()
                 current_setup = base_setup.format("cnfs/" + current_cnf, runs, get_random_backdoor_size, iterations,
                                                   temp_file, ",".join(flatten_backdoors))
-                print("current_setup:", current_setup)
                 os.system(current_setup)
                 # get size of temp file
                 temp_file_size = "cat " + temp_file + " | wc -l"
                 while int(subprocess.check_output(temp_file_size, shell=True)) != runs:
-                    print("wait")
                     time.sleep(1)
-                print("ok file")
                 # parse temp file
                 with open(temp_file, 'r') as f:
                     for line in f:
                         current_backdoors.append(line.split(':')[1].strip(' \n][').split(', '))
-                print("current_backdoors:", current_backdoors)
 
 # save backdoors to backdoors.txt
 
 with open("backdoors.txt", 'w') as f:
     for backdoor in current_backdoors:
-        f.write(": " + str(backdoor) + "\n")
+        f.write(": " + str(list(map(int, backdoor))) + "\n")
 
 
 # merge backdoors to one
