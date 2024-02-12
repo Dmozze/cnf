@@ -148,6 +148,7 @@ if __name__ == '__main__':
 
     send_to_photo(hist_path)
 
+
     # sort by length desc
     one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
     if one_hard:
@@ -168,6 +169,7 @@ if __name__ == '__main__':
             exit()
 
     print("len" + str(len(one_hard)))
+    print("FORMULA LENGTH: ", len(formula.clauses))
     hards = list(filter(lambda x: len(x) > 1, decart))
     hards.sort(key=lambda x: len(x))
     statistics = dict()
@@ -198,17 +200,18 @@ if __name__ == '__main__':
             if abs(unit[j]) not in inserted_units:
                 formula.append([-unit[j]])
                 inserted_units.add(abs(unit[j]))
-        # print("HARDS")
-        #sort by abs in each list
-        # for j in range(len(acc)):
-        #     acc[j].sort(key=lambda x: abs(x))
-        # for j in range(len(acc)):
-        #     print(acc[j])
-        # print("HARDS")
+        print("HARDS")
+        for j in range(len(acc)):
+            acc[j].sort(key=lambda x: abs(x))
+        for j in range(len(acc)):
+            print(acc[j])
+        print("HARDS")
         bi_units = get_all_biunits_from_backdoor(acc)
         cnfs = bi.all_sets_of_clauses(2)
         mapb = bi.get_map_to_dnf()
         # print("INSERTED:", inserted_units)
+        print("ACC: ", len(acc))
+
         for biunit in bi_units.values():
             bis = list(biunit)
             if len(bis) == 4 or len(bis) == 1:
@@ -228,12 +231,17 @@ if __name__ == '__main__':
             for j in range(len(jj)):
                 if jj[j] not in maybe:
                     diff.append(jj[j])
+
+            diff = bi.map_values_to_cnf(var_a, var_b, diff)
+            print(bis)
             if len(bis) == 3:
                 diff = [-diff[0][0], -diff[0][1]]
+                print("DIFF3", diff)
                 if key not in inserted_units:
                     formula.append(diff)
                     inserted_units.add(key)
             if len(bis) == 2:
+                print("DIFF2", diff)
                 if key not in inserted_units:
                     inserted_units.add(key)
                     formula.append(diff[0])
