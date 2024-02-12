@@ -34,21 +34,30 @@ def get_all_units_from_backdoor(hard_tasks):
 def get_all_biunits_from_backdoor(hard_tasks):
     if len(hard_tasks) == 0:
         return []
-    units = set()
-    for unit_i in range(len(hard_tasks[0])):
-        for unit_j in range(unit_i + 1, len(hard_tasks[0])):
-            unit_a = hard_tasks[0][unit_i]
-            unit_b = hard_tasks[0][unit_j]
-            units.add((unit_a, unit_b))
-            units.add((unit_a, -unit_b))
-            units.add((-unit_a, unit_b))
-            units.add((-unit_a, -unit_b))
+    units = dict()
+    # for unit_i in range(len(hard_tasks[0])):
+    #     for unit_j in range(unit_i + 1, len(hard_tasks[0])):
+    #         unit_a = hard_tasks[0][unit_i]
+    #         unit_b = hard_tasks[0][unit_j]
+    #         if abs(unit_a) > abs(unit_b):
+    #             unit_a, unit_b = unit_b, unit_a
+    #         key = (abs(unit_a), abs(unit_b))
+    #         if key not in units:
+    #             units[key] = set()
+    #             units[key].add((unit_a, unit_b))
+    #             units[key].add((-unit_a, unit_b))
+    #             units[key].add((unit_a, -unit_b))
+    #             units[key].add((-unit_a, -unit_b))
 
     for hard_task in hard_tasks:
         for unit_i in range(len(hard_task)):
             for unit_j in range(unit_i + 1, len(hard_task)):
                 unit_a = hard_task[unit_i]
                 unit_b = hard_task[unit_j]
-                if (unit_a, unit_b) in units:
-                    units.remove((unit_a, unit_b))
-    return list(units)
+                if abs(unit_a) > abs(unit_b):
+                    unit_a, unit_b = unit_b, unit_a
+                key = (abs(unit_a), abs(unit_b))
+                if key not in units:
+                    units[key] = set()
+                units[key].add((unit_a, unit_b))
+    return units

@@ -5,6 +5,7 @@ import time
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import bi
 
 from utils.backdoors import calculate_quality_of_backdoor
 from utils.sifter import set_up_threads, work
@@ -184,7 +185,7 @@ if __name__ == '__main__':
     hards_to_merge = hards.copy()
     hards_to_merge.pop(0)
     acc = hards[0]
-    threads_num = 1
+    threads_num = 8
     inserted_units = set()
     for i in range(1, len(hards)):
         time_merge = time.time()
@@ -193,20 +194,80 @@ if __name__ == '__main__':
         # print(acc)
         unit = get_all_units_from_backdoor(acc)
         # print(unit)
-        biunit = get_all_biunits_from_backdoor(acc)
+        for j in range(len(unit)):
+            if abs(unit[j]) not in inserted_units:
+                formula.append([-unit[j]])
+                inserted_units.add(abs(unit[j]))
+        # print("HARDS")
+        #sort by abs in each list
+        # for j in range(len(acc)):
+        #     acc[j].sort(key=lambda x: abs(x))
+        # for j in range(len(acc)):
+        #     print(acc[j])
+        # print("HARDS")
+        bi_units = get_all_biunits_from_backdoor(acc)
+        cnfs = bi.all_sets_of_clauses(2)
+        mapb = bi.get_map_to_dnf()
+        # print("INSERTED:", inserted_units)
+        for biunit in bi_units.values():
+            bis = list(biunit)
+            if len(bis) == 4 or len(bis) == 1:
+                continue
+
+            var_a = abs(bis[0][0])
+            var_b = abs(bis[0][1])
+            if var_a > var_b:
+                var_a, var_b = var_b, var_a
+            key = (var_a, var_b)
+            if var_a in inserted_units or var_b in inserted_units:
+                continue
+            assert len(bis) == 2 or len(bis) == 3
+            maybe = bi.map_values_from_cnf(var_a, var_b, bis)
+            jj = bi.all_clauses(2)
+            diff = []
+            for j in range(len(jj)):
+                if jj[j] not in maybe:
+                    diff.append(jj[j])
+            if len(bis) == 3:
+                diff = [-diff[0][0], -diff[0][1]]
+                if key not in inserted_units:
+                    formula.append(diff)
+                    inserted_units.add(key)
+            if len(bis) == 2:
+                if key not in inserted_units:
+                    inserted_units.add(key)
+                    formula.append(diff[0])
+                    formula.append(diff[1])
+
+            # print(">>>>>>>>")
+            # print(bis)
+            # print(diff)
+            # print("=============")
+            # print(bis)
+            # mapped = bi.map_values_from_cnf(var_a, var_b, bis)
+            # id_in_cnfs = -1
+            # mapped.sort()
+            # for i in range(len(cnfs)):
+            #     cnfs[i].sort()
+            #     if cnfs[i] == mapped:
+            #         id_in_cnfs = i
+            #         break
+            # direct_cnf = cnfs[mapb[id_in_cnfs]]
+            # print(direct_cnf)
+            # direct_cnf = bi.map_values_to_cnf(var_a, var_b, direct_cnf)
+            # print(direct_cnf)
+            # print("=============")
+            # for j in range(len(direct_cnf)):
+            #     hash = direct_cnf[j][0] * 1000000 + direct_cnf[j][1]
+            #     if hash not in inserted_units:
+            #         formula.append(direct_cnf[j])
+            #         inserted_units.add(hash)
+            #         print(direct_cnf[j])
+            # print("<<<<<<<<")
+
         print("Units: ", len(unit), "Biunits: ", len(biunit))
         print("Formula length: ", len(formula.clauses))
         # formula.append(unit)
-        for j in range(len(unit)):
-            if unit[j] not in inserted_units:
-                formula.append([-unit[j]])
-                inserted_units.add(unit[j])
-        # for j in range(len(biunit)):
-        #     first = biunit[j][0]
-        #     second = biunit[j][1]
-        #     formula.append([-first])
-        #     formula.append([-second])
-        print("Formula length: ", len(formula.clauses))
 
         product_size_before_prop.append(len(acc) + prop_hit)
         product_size_after_prop.append(len(acc))
@@ -215,7 +276,7 @@ if __name__ == '__main__':
         time_to_merge = time.time() - time_merge
         print("Time to merge: ", time.time() - time_merge)
 
-        if len(acc) < 36 or threads_num == 1:
+        if len(acc) < threads_num * 40 or threads_num == 1:
             filtered = work(acc, formula)
         else:
             filtered = set_up_threads(acc, threads_num, formula)
