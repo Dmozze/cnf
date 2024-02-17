@@ -213,15 +213,15 @@ if __name__ == '__main__':
             if abs(unit[j]) not in inserted_units:
                 formula.append([-unit[j]])
                 inserted_units.add(abs(unit[j]))
-        print("HARDS")
-        for j in range(len(acc)):
-            acc[j].sort(key=lambda x: abs(x))
-        for j in range(len(acc)):
-            print(acc[j])
-        print("HARDS")
-        bi_units = get_all_biunits_from_backdoor(acc)
-        cnfs = bi.all_sets_of_clauses(2)
-        mapb = bi.get_map_to_dnf()
+        # print("HARDS")
+        # for j in range(len(acc)):
+        #     acc[j].sort(key=lambda x: abs(x))
+        # for j in range(len(acc)):
+        #     print(acc[j])
+        # print("HARDS")
+        # bi_units = get_all_biunits_from_backdoor(acc)
+        # cnfs = bi.all_sets_of_clauses(2)
+        # mapb = bi.get_map_to_dnf()
         # print("INSERTED:", inserted_units)
         print("ACC: ", len(acc))
 

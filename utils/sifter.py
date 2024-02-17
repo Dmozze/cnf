@@ -15,9 +15,11 @@ def work(list_to_sift, formula, to_end=False):
             solver = Cadical153(bootstrap_with=formula)
             cnt_steps = 0
         # time_iter = time.time()
-        if not to_end:
+        if to_end:
+            solver.solve(assumptions=list_to_sift[j])
+        else:
             solver.conf_budget(utils.conf['sifter']['budget'])
-        solver.solve_limited(assumptions=list_to_sift[j])
+            solver.solve_limited(assumptions=list_to_sift[j])
         if solver.get_status() is None:
             inner_filtered.append(list_to_sift[j])
         # print("Time to iteration: ", time.time() - time_iter)
