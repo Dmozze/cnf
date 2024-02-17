@@ -97,7 +97,7 @@ def get_map_to_dnf():
                 fuck = False
     return map_dnf_to_cnf
 
-print(all_sets_of_clauses(2))
+# print(all_sets_of_clauses(2))
 
 
 def map_values_to_cnf(first, second, formula):

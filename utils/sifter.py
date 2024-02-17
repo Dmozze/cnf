@@ -40,11 +40,11 @@ def set_up_threads(acc, threads_num, formula, to_end=False):
     # bind formula to work with
     from functools import partial
 
-    work_up = partial(work, formula=formula)
+    work_up = partial(work, formula=formula, to_end=to_end)
 
     with Pool(threads_num) as pool:
         # add formula
-        inner_results = pool.map(work_up, acc_parts, to_end)
+        inner_results = pool.map(work_up, acc_parts)
 
     # merge results
     filtered = []

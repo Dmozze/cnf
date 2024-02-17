@@ -158,8 +158,8 @@ if __name__ == '__main__':
 
     solving_times[LIMITED_SOLVED] = []
     solving_times[FULL_SOLVED] = []
-    solving_times[LIMITED_SOLVED_ACC] = []
-    solving_times[FULL_SOLVED_ACC] = []
+    solving_times[LIMITED_SOLVED_ACC] = [0.0]
+    solving_times[FULL_SOLVED_ACC] = [0.0]
 
 
     # sort by length desc
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         # track time to full solving
         time_full = time.time()
 
-        filtered = set_up_threads(acc, threads_num, formula)
+        filtered = set_up_threads(acc, threads_num, formula, to_end=True)
 
         time_full = time.time() - time_full
 
