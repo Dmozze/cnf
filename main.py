@@ -225,40 +225,40 @@ if __name__ == '__main__':
         # print("INSERTED:", inserted_units)
         print("ACC: ", len(acc))
 
-        for biunit in bi_units.values():
-            bis = list(biunit)
-            if len(bis) == 4 or len(bis) == 1:
-                continue
+        # for biunit in bi_units.values():
+        #     bis = list(biunit)
+        #     if len(bis) == 4 or len(bis) == 1:
+        #         continue
+        #
+        #     var_a = abs(bis[0][0])
+        #     var_b = abs(bis[0][1])
+        #     if var_a > var_b:
+        #         var_a, var_b = var_b, var_a
+        #     key = (var_a, var_b)
+        #     if var_a in inserted_units or var_b in inserted_units:
+        #         continue
+        #     assert len(bis) == 2 or len(bis) == 3
+            # maybe = bi.map_values_from_cnf(var_a, var_b, bis)
+            # jj = bi.all_clauses(2)
+            # diff = []
+            # for j in range(len(jj)):
+            #     if jj[j] not in maybe:
+            #         diff.append(jj[j])
 
-            var_a = abs(bis[0][0])
-            var_b = abs(bis[0][1])
-            if var_a > var_b:
-                var_a, var_b = var_b, var_a
-            key = (var_a, var_b)
-            if var_a in inserted_units or var_b in inserted_units:
-                continue
-            assert len(bis) == 2 or len(bis) == 3
-            maybe = bi.map_values_from_cnf(var_a, var_b, bis)
-            jj = bi.all_clauses(2)
-            diff = []
-            for j in range(len(jj)):
-                if jj[j] not in maybe:
-                    diff.append(jj[j])
-
-            diff = bi.map_values_to_cnf(var_a, var_b, diff)
-            print(bis)
-            if len(bis) == 3:
-                diff = [-diff[0][0], -diff[0][1]]
-                print("DIFF3", diff)
-                if key not in inserted_units:
-                    formula.append(diff)
-                    inserted_units.add(key)
-            if len(bis) == 2:
-                print("DIFF2", diff)
-                if key not in inserted_units:
-                    inserted_units.add(key)
-                    formula.append(diff[0])
-                    formula.append(diff[1])
+            # diff = bi.map_values_to_cnf(var_a, var_b, diff)
+            # print(bis)
+            # if len(bis) == 3:
+            #     diff = [-diff[0][0], -diff[0][1]]
+            #     print("DIFF3", diff)
+            #     if key not in inserted_units:
+            #         formula.append(diff)
+            #         inserted_units.add(key)
+            # if len(bis) == 2:
+            #     print("DIFF2", diff)
+            #     if key not in inserted_units:
+            #         inserted_units.add(key)
+            #         formula.append(diff[0])
+            #         formula.append(diff[1])
 
             # print(">>>>>>>>")
             # print(bis)
@@ -286,7 +286,7 @@ if __name__ == '__main__':
             #         print(direct_cnf[j])
             # print("<<<<<<<<")
 
-        print("Units: ", len(unit), "Biunits: ", len(biunit))
+        # print("Units: ", len(unit), "Biunits: ", len(biunit))
         print("Formula length: ", len(formula.clauses))
         # formula.append(unit)
 
@@ -300,10 +300,7 @@ if __name__ == '__main__':
         # track time to full solving
         time_full = time.time()
 
-        if len(acc) < threads_num * 40 or threads_num == 1:
-            filtered = work(acc, formula)
-        else:
-            filtered = set_up_threads(acc, threads_num, formula)
+        filtered = set_up_threads(acc, threads_num, formula)
 
         time_full = time.time() - time_full
 
