@@ -4,7 +4,7 @@ from pysat.solvers import Cadical153
 import utils
 
 
-def work(list_to_sift, formula):
+def work(list_to_sift, formula, to_end=False):
     inner_filtered = []
     solver = Cadical153(bootstrap_with=formula)
     cnt_steps = 0
@@ -15,7 +15,8 @@ def work(list_to_sift, formula):
             solver = Cadical153(bootstrap_with=formula)
             cnt_steps = 0
         # time_iter = time.time()
-        solver.conf_budget(utils.conf['sifter']['budget'])
+        if not to_end:
+            solver.conf_budget(utils.conf['sifter']['budget'])
         solver.solve_limited(assumptions=list_to_sift[j])
         if solver.get_status() is None:
             inner_filtered.append(list_to_sift[j])
@@ -26,7 +27,7 @@ def work(list_to_sift, formula):
     return inner_filtered
 
 
-def set_up_threads(acc, threads_num, formula):
+def set_up_threads(acc, threads_num, formula, to_end=False):
     acc_parts = np.array_split(acc, max(threads_num, len(acc) / 150))
     for j in range(len(acc_parts)):
         acc_parts[j] = acc_parts[j].tolist()
@@ -41,7 +42,7 @@ def set_up_threads(acc, threads_num, formula):
 
     with Pool(threads_num) as pool:
         # add formula
-        inner_results = pool.map(work_up, acc_parts)
+        inner_results = pool.map(work_up, acc_parts, to_end)
 
     # merge results
     filtered = []

@@ -149,6 +149,19 @@ if __name__ == '__main__':
     send_to_photo(hist_path)
 
 
+    solving_times = {}
+
+    LIMITED_SOLVED = "LIMITED_SOLVED"
+    FULL_SOLVED = "FULL_SOLVED"
+    LIMITED_SOLVED_ACC = "LIMITED_SOLVED_ACC"
+    FULL_SOLVED_ACC = "FULL_SOLVED_ACC"
+
+    solving_times[LIMITED_SOLVED] = []
+    solving_times[FULL_SOLVED] = []
+    solving_times[LIMITED_SOLVED_ACC] = []
+    solving_times[FULL_SOLVED_ACC] = []
+
+
     # sort by length desc
     one_hard = list(map(lambda x: x[0], filter(lambda x: len(x) == 1, decart)))
     if one_hard:
@@ -284,10 +297,31 @@ if __name__ == '__main__':
         time_to_merge = time.time() - time_merge
         print("Time to merge: ", time.time() - time_merge)
 
+        # track time to full solving
+        time_full = time.time()
+
         if len(acc) < threads_num * 40 or threads_num == 1:
             filtered = work(acc, formula)
         else:
             filtered = set_up_threads(acc, threads_num, formula)
+
+        time_full = time.time() - time_full
+
+
+        # track time to limited solving
+        time_limited = time.time()
+
+        if len(acc) < threads_num * 40 or threads_num == 1:
+            filtered = work(acc, formula)
+        else:
+            filtered = set_up_threads(acc, threads_num, formula)
+
+        time_limited = time.time() - time_limited
+
+        solving_times[LIMITED_SOLVED_ACC].append(solving_times[LIMITED_SOLVED_ACC][-1] + time_limited)
+        solving_times[FULL_SOLVED_ACC].append(solving_times[FULL_SOLVED_ACC][-1] + time_full)
+        solving_times[LIMITED_SOLVED].append(time_limited)
+        solving_times[FULL_SOLVED].append(time_full)
 
 
         def get_statistics():
@@ -306,6 +340,8 @@ if __name__ == '__main__':
             if len(filtered) == 0:
                 global solved
                 solved = True
+                inner_statistics[LIMITED_SOLVED_ACC] = solving_times[LIMITED_SOLVED_ACC]
+                inner_statistics[FULL_SOLVED_ACC] = solving_times[FULL_SOLVED_ACC]
                 print("SUCCESS")
                 inner_statistics['success'] = True
             return inner_statistics
