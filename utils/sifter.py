@@ -48,7 +48,8 @@ def set_up_threads(acc, threads_num, formula, to_end=False):
 
     # merge results
     filtered = []
-    for result in inner_results:
-        filtered += result
+    if not to_end:
+        for result in inner_results:
+            filtered += result
 
     return filtered
