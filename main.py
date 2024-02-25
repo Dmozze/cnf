@@ -195,6 +195,7 @@ if __name__ == '__main__':
     statistics = dict()
 
     # print(calculate_quality_of_backdoor(hards))
+    os.system("mkdir saves/")
 
     # print(list(map(len, decart)))
     hards_to_merge = hards.copy()
@@ -213,6 +214,16 @@ if __name__ == '__main__':
             if abs(unit[j]) not in inserted_units:
                 formula.append([-unit[j]])
                 inserted_units.add(abs(unit[j]))
+
+        # make dir to save formula
+        CNF.to_file(formula, f'{i}.cnf')
+        # write down all hards
+        with open(f'saves/{i}.txt', 'w') as f:
+            for hard in acc:
+                # write by space
+                f.write(' '.join(map(str, hard)))
+
+
         # print("HARDS")
         # for j in range(len(acc)):
         #     acc[j].sort(key=lambda x: abs(x))
@@ -299,9 +310,9 @@ if __name__ == '__main__':
 
         # track time to full solving
         time_full = time.time()
-
-        filtered = set_up_threads(acc, threads_num, formula, to_end=True)
-
+        #
+        # filtered = set_up_threads(acc, threads_num, formula, to_end=True)
+        #
         time_full = time.time() - time_full
 
 

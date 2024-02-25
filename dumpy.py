@@ -20,4 +20,4 @@ statistics = dict()
 statistics['name'] = sys.argv[1]
 statistics['time_to_dumpy'] = time.time() - start
 statistics['success'] = True
-send_to_telegram(statistics, sys.argv[2])
+send_to_telegram(statistics)
